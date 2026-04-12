@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>D&S Coffee and Sweet</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --brown:#A0522D;--brown2:#7B3F1E;--brown3:#5C2E10;
+  --cream:#FDF6EE;--cream2:#F5EAD8;
+  --gold:#F5A623;--pink:#E0457B;--purple:#9B2D6F;
+  --dark:#1A0F0A;--text:#2D1A10;--muted:#8B6555;
+  --card:#FFFAF5;--border:#EDD9C8;
+  --grad:linear-gradient(135deg,#F5A623 0%,#E0457B 50%,#9B2D6F 100%);
+  --r:14px;
+}
+html,body{height:100%;background:var(--cream);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+
+/* ── HEADER ── */
+.header{background:var(--brown2);padding:46px 16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.hrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.logo{width:44px;height:44px;border-radius:50%;background:conic-gradient(from 0deg,#F5A623,#E0457B,#9B2D6F,#F5A623);padding:2px;flex-shrink:0}
+.logo-in{width:100%;height:100%;border-radius:50%;background:var(--brown);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.68rem;font-weight:900;color:#fff;text-align:center;line-height:1.1}
+.htitle{flex:1}
+.htitle h1{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fff;line-height:1}
+.htitle p{font-size:.68rem;color:rgba(255,255,255,.55);margin-top:2px;letter-spacing:.5px}
+.cart-fab{position:relative;background:var(--gold);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:1.15rem;box-shadow:0 2px 8px rgba(245,166,35,.45)}
+.cart-badge{position:absolute;top:-6px;right:-6px;background:var(--pink);color:#fff;font-size:.6rem;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 4px}
+.tabs{display:flex;gap:4px;padding-bottom:1px}
+.tab{flex:1;background:transparent;border:none;color:rgba(255,255,255,.5);font-size:.72rem;font-weight:500;font-family:'DM Sans',sans-serif;padding:9px 4px 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;transition:all .2s}
+.tab-ico{font-size:1.05rem}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── PAGES ── */
+.page{display:none;padding:16px 16px 100px;animation:fadeUp .2s ease}
+.page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CATEGORY FILTER ── */
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px;margin-bottom:2px}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;white-space:nowrap;cursor:pointer;transition:all .2s;flex-shrink:0;font-size:.78rem;font-weight:500;color:var(--muted)}
+.cat-chip.on{background:var(--brown2);border-color:var(--brown2);color:#fff;font-weight:600}
+.cat-chip-ico{font-size:1rem}
+
+/* ── PRODUCTS GRID ── */
+.sec-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--text);margin:4px 0 12px}
+.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.prod-card{background:var(--card);border-radius:var(--r);overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:transform .15s;box-shadow:0 2px 8px rgba(160,82,45,.08)}
+.prod-card:active{transform:scale(.97)}
+.prod-thumb{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#fff5eb,#fde8d4);display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+.prod-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:opacity .3s}
+.prod-thumb img.loading{opacity:0}
+.prod-body{padding:10px}
+.prod-name{font-size:.83rem;font-weight:600;margin-bottom:5px;line-height:1.3;color:var(--text)}
+.prod-desc{font-size:.7rem;color:var(--muted);margin-bottom:7px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod-row{display:flex;align-items:center;justify-content:space-between}
+.prod-price{font-size:.88rem;font-weight:700;color:var(--brown2)}
+.plus-btn{background:var(--grad);border:none;border-radius:8px;width:28px;height:28px;color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(224,69,123,.4);transition:transform .15s}
+.plus-btn:active{transform:scale(.85)}
+
+/* ── SCREENS (full-page overlays) ── */
+.screen{display:none;position:fixed;inset:0;background:var(--cream);z-index:300;overflow-y:auto;animation:slideUp .25s ease}
+.screen.on{display:block}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.scr-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);border-radius:50%;width:36px;height:36px;color:#fff;font-size:.95rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+.scr-back{background:var(--card);border:1px solid var(--border);border-radius:50%;width:36px;height:36px;color:var(--brown2);font-size:1.25rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* ── DETAIL SCREEN ── */
+.detail-hero{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#fff5eb,#fde8d4);display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden}
+.detail-hero img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.detail-body{padding:20px}
+.detail-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:8px}
+.detail-desc{font-size:.88rem;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.detail-price{font-size:1.6rem;font-weight:700;color:var(--brown2);margin-bottom:22px}
+.qty-row{display:flex;align-items:center;gap:18px;margin-bottom:20px}
+.qty-btn{background:var(--card);border:1.5px solid var(--border);border-radius:10px;width:42px;height:42px;color:var(--brown2);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700}
+.qty-n{font-size:1.25rem;font-weight:700;min-width:26px;text-align:center;color:var(--text)}
+.big-btn{width:100%;background:var(--grad);border:none;border-radius:var(--r);color:#fff;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;padding:15px;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 16px rgba(224,69,123,.35);transition:opacity .2s}
+.big-btn:active{opacity:.85}
+.big-btn.brown{background:var(--brown2);box-shadow:0 4px 16px rgba(123,63,30,.35)}
+
+/* ── CART SCREEN ── */
+.scr-pad{padding:20px 16px 100px}
+.scr-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.cart-items{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ci{background:var(--card);border-radius:var(--r);padding:12px;display:flex;gap:12px;align-items:center;border:1px solid var(--border)}
+.ci-img{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#fff5eb,#fde8d4);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-size:.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-price{font-size:.8rem;color:var(--brown2);font-weight:700;margin-top:3px}
+.ci-qty{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.cq-btn{background:var(--cream2);border:none;border-radius:7px;width:28px;height:28px;color:var(--brown2);font-size:.95rem;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700}
+.cq-n{font-size:.88rem;font-weight:700;min-width:16px;text-align:center}
+.total-row{background:var(--card);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border:1px solid var(--border)}
+.total-lbl{font-size:.88rem;color:var(--muted)}
+.total-val{font-size:1.2rem;font-weight:700;color:var(--brown2)}
+
+/* ── CHECKOUT ── */
+.fg{margin-bottom:14px}
+.fl{font-size:.7rem;color:var(--muted);margin-bottom:6px;display:block;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.fi{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:11px;color:var(--text);font-size:.95rem;padding:13px 15px;outline:none;transition:border-color .2s;-webkit-appearance:none;font-family:'DM Sans',sans-serif}
+.fi:focus{border-color:var(--brown)}
+
+/* ── SUCCESS ── */
+.success-box{text-align:center;padding:70px 20px}
+.sico{font-size:4.5rem;margin-bottom:20px}
+.stitle{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+.stxt{font-size:.88rem;color:var(--muted);line-height:1.7}
+
+/* ── ORDERS PAGE ── */
+.order-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(160,82,45,.06)}
+.oh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.oid{font-size:.82rem;font-weight:700}
+.odate{font-size:.68rem;color:var(--muted);margin-top:2px}
+.ostatus{font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(245,166,35,.15);color:var(--gold)}
+.ostatus.accepted{background:rgba(34,197,94,.12);color:#16a34a}
+.ostatus.done{background:rgba(59,130,246,.12);color:#1d4ed8}
+.ostatus.cancelled{background:rgba(239,68,68,.1);color:#dc2626}
+.oitem{font-size:.78rem;color:var(--muted);padding:2px 0}
+.ototal{font-size:.88rem;font-weight:700;color:var(--brown2);margin-top:8px}
+
+/* ── CONTACT PAGE ── */
+.clink{background:var(--card);border-radius:var(--r);padding:15px;margin-bottom:11px;display:flex;align-items:center;gap:14px;cursor:pointer;border:1px solid var(--border);text-decoration:none;transition:background .15s;box-shadow:0 2px 8px rgba(160,82,45,.06)}
+.clink:active{background:var(--cream2)}
+.cico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.cico.ph{background:rgba(245,166,35,.15)}
+.cico.ig{background:rgba(255,60,172,.15)}
+.cico.tg{background:rgba(55,138,221,.15)}
+.cico.loc{background:rgba(160,82,45,.15)}
+.cico.time{background:rgba(34,197,94,.12)}
+.clbl h3{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.clbl p{font-size:.78rem;color:var(--muted)}
+.carr{margin-left:auto;color:var(--muted);font-size:1.1rem}
+
+/* ── EMPTY ── */
+.empty-box{text-align:center;padding:50px 20px}
+.empty-ico{font-size:3.5rem;margin-bottom:12px}
+.empty-txt{font-size:.9rem;color:var(--muted);margin-bottom:18px}
+.go-btn{background:var(--brown2);color:#fff;border:none;padding:10px 24px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer}
+
+/* ── ACCENT ── */
+.accent{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hrow">
+    <div class="logo"><div class="logo-in">D☕S</div></div>
+    <div class="htitle">
+      <h1>D&S Coffee</h1>
+      <p>Coffee and Sweet</p>
+    </div>
+    <button class="cart-fab" onclick="openCart()">
+      🛒<span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="nav('catalog',this)"><span class="tab-ico">☕</span>Menu</button>
+    <button class="tab" onclick="nav('orders',this)"><span class="tab-ico">📦</span>Buyurtmalar</button>
+    <button class="tab" onclick="nav('contact',this)"><span class="tab-ico">📞</span>Kontakt</button>
+  </div>
+</div>
+
+<!-- ===== CATALOG ===== -->
+<div class="page on" id="page-catalog">
+  <div class="cat-scroll" id="catScroll"></div>
+  <div class="sec-title" id="catTitle">Ichimliklar</div>
+  <div class="prod-grid" id="prodGrid"></div>
+</div>
+
+<!-- ===== ORDERS ===== -->
+<div class="page" id="page-orders">
+  <div class="sec-title">Mening buyurtmalarim</div>
+  <div id="ordersList"></div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<div class="page" id="page-contact">
+  <div class="sec-title">Biz bilan bog'laning</div>
+  <a class="clink" href="tel:+998900000000">
+    <div class="cico ph">📞</div>
+    <div class="clbl"><h3>Telefon</h3><p>+998 90 000 00 00</p></div>
+    <span class="carr">›</span>
+  </a>
+  <a class="clink" href="https://instagram.com/ds_coffee_sweet" target="_blank">
+    <div class="cico ig">📸</div>
+    <div class="clbl"><h3>Instagram</h3><p>@ds_coffee_sweet</p></div>
+    <span class="carr">›</span>
+  </a>
+  <a class="clink" href="https://t.me/ds_coffee_sweet" target="_blank">
+    <div class="cico tg">✈️</div>
+    <div class="clbl"><h3>Telegram</h3><p>@ds_coffee_sweet</p></div>
+    <span class="carr">›</span>
+  </a>
+  <div class="clink">
+    <div class="cico loc">📍</div>
+    <div class="clbl"><h3>Manzil</h3><p>Toshkent sh., Chilonzor tumani</p></div>
+  </div>
+  <div class="clink">
+    <div class="cico time">🕐</div>
+    <div class="clbl"><h3>Ish vaqti</h3><p>Har kuni: 08:00 — 23:00</p></div>
+  </div>
+</div>
+
+<!-- ===== DETAIL SCREEN ===== -->
+<div class="screen" id="scrDetail">
+  <button class="scr-close" onclick="closeScr('scrDetail')">✕</button>
+  <div class="detail-hero" id="dHero"></div>
+  <div class="detail-body">
+    <div class="detail-name" id="dName"></div>
+    <div class="detail-desc" id="dDesc"></div>
+    <div class="detail-price" id="dPrice"></div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="dq(-1)">−</button>
+      <span class="qty-n" id="dQty">1</span>
+      <button class="qty-btn" onclick="dq(1)">+</button>
+    </div>
+    <button class="big-btn" onclick="addFromDetail()">🛒 Savatga qo'shish</button>
+  </div>
+</div>
+
+<!-- ===== CART SCREEN ===== -->
+<div class="screen" id="scrCart">
+  <div class="scr-pad">
+    <div class="scr-title">
+      <button class="scr-back" onclick="closeScr('scrCart')">‹</button>
+      🛒 Savatcha
+    </div>
+    <div id="cartBody"></div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT SCREEN ===== -->
+<div class="screen" id="scrCheckout">
+  <div class="scr-pad">
+    <div class="scr-title">
+      <button class="scr-back" onclick="closeScr('scrCheckout')">‹</button>
+      Buyurtma berish
+    </div>
+    <div class="fg"><label class="fl">Ismingiz</label><input class="fi" id="iName" type="text" placeholder="To'liq ismingiz"></div>
+    <div class="fg"><label class="fl">Telefon</label><input class="fi" id="iPhone" type="tel" placeholder="+998 90 000 00 00"></div>
+    <div class="fg"><label class="fl">Manzil / Xona raqami</label><input class="fi" id="iAddr" type="text" placeholder="Ko'cha, uy, xona raqami"></div>
+    <div class="fg"><label class="fl">Izoh (ixtiyoriy)</label><input class="fi" id="iNote" type="text" placeholder="Masalan: kam achchiq, ko'p sous..."></div>
+    <button class="big-btn" style="margin-top:8px" onclick="submitOrder()">✅ Buyurtmani tasdiqlash</button>
+  </div>
+</div>
+
+<!-- ===== SUCCESS SCREEN ===== -->
+<div class="screen" id="scrSuccess">
+  <div class="success-box">
+    <div class="sico">🎉</div>
+    <div class="stitle">Buyurtma qabul qilindi!</div>
+    <div class="stxt">Tez orada siz bilan bog'lanamiz.<br>Buyurtmangiz tayyorlanmoqda ☕</div>
+    <button class="big-btn brown" style="margin-top:32px" onclick="goHome()">☕ Bosh sahifaga qaytish</button>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor && tg.setHeaderColor('#7B3F1E'); }
+
+// ───── MENU DATA WITH REAL IMAGES ─────
+const DEFAULT_PRODUCTS = [
+  // ── Ichimliklar ──
+  {id:1, name:"Espresso",       cat:"Ichimliklar", em:"☕", price:15000,
+   img:"https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&q=80",
+   desc:"Kuchli va to'yimli, klassik italyan espresso"},
+  {id:2, name:"Cappuccino",     cat:"Ichimliklar", em:"☕", price:22000,
+   img:"https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80",
+   desc:"Yumshoq ko'pik va espresso — mukammal uyg'unlik"},
+  {id:3, name:"Latte",          cat:"Ichimliklar", em:"🥛", price:24000,
+   img:"https://images.unsplash.com/photo-1561047029-3000c68339ca?w=400&q=80",
+   desc:"Yumshoq sut va espresso, art latte bezagi bilan"},
+  {id:4, name:"Americano",      cat:"Ichimliklar", em:"☕", price:18000,
+   img:"https://images.unsplash.com/photo-1521302080334-4bebac2763a6?w=400&q=80",
+   desc:"Klassik qora qahva, to'g'ri va kuchli ta'm"},
+  {id:5, name:"Maxito Klassik", cat:"Ichimliklar", em:"🧋", price:28000,
+   img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+   desc:"Sovuq muzli maxito, yoz uchun ideal serinlatuvchi"},
+  {id:6, name:"Maxito Shokolad",cat:"Ichimliklar", em:"🍫", price:30000,
+   img:"https://images.unsplash.com/photo-1578374173703-64e12c55db62?w=400&q=80",
+   desc:"Qoʻshimcha shokolad syrop bilan boyitilgan maxito"},
+  {id:7, name:"Maxito Karamel", cat:"Ichimliklar", em:"🍯", price:30000,
+   img:"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80",
+   desc:"Karamel syrop qo'shilgan kremli sovuq maxito"},
+  {id:8, name:"Frappuccino",    cat:"Ichimliklar", em:"🥤", price:32000,
+   img:"https://images.unsplash.com/photo-1540162875240-a3f3a369da89?w=400&q=80",
+   desc:"Muzli kremli qahva ichimlik — chiroyli va mazali"},
+  {id:9, name:"Matcha Latte",   cat:"Ichimliklar", em:"🍵", price:26000,
+   img:"https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&q=80",
+   desc:"Yapon yashil choy va sut — sog'lom va foydali"},
+  {id:10,name:"Mango Smoothie", cat:"Ichimliklar", em:"🥭", price:25000,
+   img:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&q=80",
+   desc:"Yangi mango va yogurt asosida tayyorlangan smoothie"},
+  {id:11,name:"Qoʻshimcha Sut", cat:"Ichimliklar", em:"🍼", price:8000,
+   img:"https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=80",
+   desc:"Issiq yoki sovuq toza sut, 300ml"},
+  {id:12,name:"Limonad",        cat:"Ichimliklar", em:"🍋", price:18000,
+   img:"https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?w=400&q=80",
+   desc:"Toza limon va nane asosida uy limonadasi"},
+
+  // ── Shirinliklar ──
+  {id:13,name:"Cheesecake",     cat:"Shirinliklar", em:"🍰", price:35000,
+   img:"https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&q=80",
+   desc:"New York uslubida klassik pishloqli tort, limon va yerto'la bilan"},
+  {id:14,name:"Tiramisu",       cat:"Shirinliklar", em:"🎂", price:38000,
+   img:"https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&q=80",
+   desc:"Haqiqiy italyan tiramisu — maskarpone va espresso"},
+  {id:15,name:"Brownie",        cat:"Shirinliklar", em:"🍫", price:22000,
+   img:"https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=400&q=80",
+   desc:"Issiq va yumshoq shokoladli brownie, muzqaymoq bilan"},
+  {id:16,name:"Croissant",      cat:"Shirinliklar", em:"🥐", price:18000,
+   img:"https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80",
+   desc:"Har kuni yangi yopilgan frantsuz croissanti — xrizantli va yengilgina"},
+  {id:17,name:"Waffle",         cat:"Shirinliklar", em:"🧇", price:28000,
+   img:"https://images.unsplash.com/photo-1568051243851-f9b136146e97?w=400&q=80",
+   desc:"Belgiya wafflasi — bal va meva bilan bezatilgan"},
+  {id:18,name:"Makaron",        cat:"Shirinliklar", em:"🫐", price:12000,
+   img:"https://images.unsplash.com/photo-1558326567-98166e232c52?w=400&q=80",
+   desc:"Frantsuz makaroni — turli xil ta'mda, har biri bir zavq"},
+  {id:19,name:"Donut",          cat:"Shirinliklar", em:"🍩", price:15000,
+   img:"https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80",
+   desc:"Yangi yopilgan donut — renkli glazur va sprinkes bilan"},
+  {id:20,name:"Muffin",         cat:"Shirinliklar", em:"🧁", price:16000,
+   img:"https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=400&q=80",
+   desc:"Limon va yong'oqli yumshoq muffin — nonushtaga ideal"},
+  {id:21,name:"Cake Pop",       cat:"Shirinliklar", em:"🍭", price:10000,
+   img:"https://images.unsplash.com/photo-1562440499-64c9a111f713?w=400&q=80",
+   desc:"Tayoqchali kichkina tort — bolalar va kattalar uchun"},
+  {id:22,name:"Eclaire",        cat:"Shirinliklar", em:"🍮", price:20000,
+   img:"https://images.unsplash.com/photo-1583778176476-4a8b02a64c01?w=400&q=80",
+   desc:"Frantsuz ekler — krem va shokolad glazur bilan"},
+
+  // ── Milliy Taomlar ──
+  {id:23,name:"Somsa",          cat:"Milliy Taomlar", em:"🥟", price:12000,
+   img:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+   desc:"Go'sht va piyoz bilan tandirda pishirilgan issiq somsa"},
+  {id:24,name:"Lag'mon",        cat:"Milliy Taomlar", em:"🍜", price:35000,
+   img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80",
+   desc:"Qo'lda tortilgan maxsus lag'mon — go'sht va sabzavot bilan"},
+  {id:25,name:"Dimlama",        cat:"Milliy Taomlar", em:"🫕", price:40000,
+   img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80",
+   desc:"Qozon dimlama — turli sabzavot va mol go'shti bilan"},
+  {id:26,name:"Manty",          cat:"Milliy Taomlar", em:"🥠", price:30000,
+   img:"https://images.unsplash.com/photo-1625937286074-9ca519d5d9df?w=400&q=80",
+   desc:"Bug'da pishirilgan manty — qatiq va yashil piyoz bilan"},
+  {id:27,name:"Tandir Non",     cat:"Milliy Taomlar", em:"🫓", price:8000,
+   img:"https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
+   desc:"Tandirda yopilgan issiq non — nonushta uchun ideal"},
+  {id:28,name:"Shurva",         cat:"Milliy Taomlar", em:"🍲", price:32000,
+   img:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80",
+   desc:"Mol go'shti va sabzavotlardan tayyorlangan milliy sho'rva"},
+  {id:29,name:"Kabob",          cat:"Milliy Taomlar", em:"🍢", price:45000,
+   img:"https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=80",
+   desc:"Ko'mirda qovilgan mol kabob — ko'k piyoz va non bilan"},
+  {id:30,name:"Mastava",        cat:"Milliy Taomlar", em:"🥣", price:30000,
+   img:"https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=400&q=80",
+   desc:"Guruch va go'sht bilan tayyorlangan milliy mastava sho'rva"},
+  {id:31,name:"Samsa (katta)",  cat:"Milliy Taomlar", em:"🥧", price:18000,
+   img:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+   desc:"Katta qo'yqo'l samsa — to'liq to'yimli tushlik uchun"},
+  {id:32,name:"Chuchvara",      cat:"Milliy Taomlar", em:"🍵", price:28000,
+   img:"https://images.unsplash.com/photo-1547592181-5b4c7c2f5b2c?w=400&q=80",
+   desc:"Qo'lda yasalgan chuchvara — qatiq yoki sho'rva bilan"},
+];
+
+const CATEGORIES = [
+  {id:"Ichimliklar",    ico:"☕"},
+  {id:"Shirinliklar",  ico:"🍰"},
+  {id:"Milliy Taomlar",ico:"🍽️"},
+];
+
+let PRODUCTS = (() => { try { return JSON.parse(localStorage.getItem('ds_products') || 'null') || DEFAULT_PRODUCTS; } catch(e){ return DEFAULT_PRODUCTS; } })();
+let cart     = (() => { try { return JSON.parse(localStorage.getItem('ds_cart') || '{}'); } catch(e){ return {}; } })();
+let orders   = (() => { try { return JSON.parse(localStorage.getItem('ds_orders') || '[]'); } catch(e){ return []; } })();
+let curCat   = 'Ichimliklar';
+let curProd  = null;
+let curQty   = 1;
+
+function save(){
+  localStorage.setItem('ds_cart', JSON.stringify(cart));
+  localStorage.setItem('ds_orders', JSON.stringify(orders));
+}
+
+// ── NAV ──
+function nav(name, btn){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name === 'orders') renderOrders();
+}
+
+// ── CATEGORY CHIPS ──
+function buildCats(){
+  const el = document.getElementById('catScroll');
+  el.innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-chip${c.id===curCat?' on':''}" onclick="selectCat('${c.id}',this)">
+      <span class="cat-chip-ico">${c.ico}</span>${c.id}
+    </div>`).join('');
+}
+
+function selectCat(cat, el){
+  curCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('catTitle').textContent = cat;
+  renderProds();
+}
+
+// ── PRODUCTS ──
+function renderProds(){
+  const list = PRODUCTS.filter(p => p.cat === curCat);
+  document.getElementById('prodGrid').innerHTML = list.map(p => `
+    <div class="prod-card" onclick="openDetail(${p.id})">
+      <div class="prod-thumb">
+        ${p.img ? `<img src="${p.img}" alt="${p.name}" class="loading" onload="this.classList.remove('loading')" onerror="this.style.display='none'">` : ''}
+        <span style="position:relative;z-index:1">${p.em}</span>
+      </div>
+      <div class="prod-body">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc}</div>
+        <div class="prod-row">
+          <span class="prod-price">${p.price.toLocaleString()} so'm</span>
+          <button class="plus-btn" onclick="event.stopPropagation();quickAdd(${p.id})">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DETAIL ──
+function openDetail(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  curProd = p; curQty = 1;
+  const hero = document.getElementById('dHero');
+  hero.innerHTML = `${p.img ? `<img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'">` : ''}<span style="position:relative;z-index:1">${p.em}</span>`;
+  document.getElementById('dName').textContent  = p.name;
+  document.getElementById('dDesc').textContent  = p.desc;
+  document.getElementById('dPrice').textContent = p.price.toLocaleString() + " so'm";
+  document.getElementById('dQty').textContent   = 1;
+  document.getElementById('scrDetail').classList.add('on');
+}
+
+function closeScr(id){ document.getElementById(id).classList.remove('on'); }
+function dq(d){ curQty = Math.max(1, curQty+d); document.getElementById('dQty').textContent = curQty; }
+
+function addFromDetail(){
+  if(!curProd) return;
+  addToCart(curProd, curQty);
+  closeScr('scrDetail');
+}
+
+function quickAdd(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(p) addToCart(p, 1);
+}
+
+function addToCart(p, qty){
+  const k = String(p.id);
+  if(cart[k]) cart[k].qty += qty;
+  else cart[k] = {name:p.name, price:p.price, em:p.em, img:p.img||null, qty};
+  save(); updateBadge();
+  tg?.HapticFeedback?.impactOccurred('light');
+}
+
+// ── CART ──
+function updateBadge(){
+  const n = Object.values(cart).reduce((s,i) => s+i.qty, 0);
+  const el = document.getElementById('cartBadge');
+  el.style.display = n > 0 ? 'flex' : 'none';
+  el.textContent   = n;
+}
+
+function openCart(){ renderCart(); document.getElementById('scrCart').classList.add('on'); }
+
+function renderCart(){
+  const keys = Object.keys(cart);
+  const cb = document.getElementById('cartBody');
+  if(!keys.length){
+    cb.innerHTML = '<div class="empty-box"><div class="empty-ico">🛒</div><div class="empty-txt">Savatchangiz bo\'sh</div></div>';
+    return;
+  }
+  const total = keys.reduce((s,k) => s + cart[k].price*cart[k].qty, 0);
+  cb.innerHTML =
+    '<div class="cart-items">'+
+    keys.map(k =>
+      `<div class="ci">
+        <div class="ci-img">${cart[k].img ? `<img src="${cart[k].img}" onerror="this.style.display='none'">` : ''}${cart[k].em}</div>
+        <div class="ci-info">
+          <div class="ci-name">${cart[k].name}</div>
+          <div class="ci-price">${(cart[k].price*cart[k].qty).toLocaleString()} so'm</div>
+        </div>
+        <div class="ci-qty">
+          <button class="cq-btn" onclick="cqty('${k}',-1)">−</button>
+          <span class="cq-n">${cart[k].qty}</span>
+          <button class="cq-btn" onclick="cqty('${k}',1)">+</button>
+        </div>
+      </div>`).join('')+
+    '</div>'+
+    `<div class="total-row"><span class="total-lbl">Jami:</span><span class="total-val">${total.toLocaleString()} so'm</span></div>`+
+    '<button class="big-btn" onclick="openCheckout()">Buyurtma berish →</button>';
+}
+
+function cqty(k,d){
+  cart[k].qty += d;
+  if(cart[k].qty <= 0) delete cart[k];
+  save(); updateBadge(); renderCart();
+}
+
+// ── CHECKOUT ──
+function openCheckout(){ document.getElementById('scrCheckout').classList.add('on'); }
+
+async function submitOrder(){
+  const name  = document.getElementById('iName').value.trim();
+  const phone = document.getElementById('iPhone').value.trim();
+  const addr  = document.getElementById('iAddr').value.trim();
+  const note  = document.getElementById('iNote').value.trim();
+  if(!name||!phone||!addr){ alert("Iltimos, barcha majburiy maydonlarni to'ldiring!"); return; }
+
+  const total = Object.values(cart).reduce((s,i) => s+i.price*i.qty, 0);
+  const itemsArr = Object.values(cart).map(i => `  • ${i.em} ${i.name} x${i.qty} = ${(i.price*i.qty).toLocaleString()} so'm`);
+
+  // Send via sendData (preferred) or directly
+  const orderPayload = {
+    type: 'order',
+    name, phone, addr, note,
+    items: {...cart},
+    total,
+    date: new Date().toLocaleString('uz-UZ')
+  };
+
+  if(tg && tg.sendData){
+    tg.sendData(JSON.stringify(orderPayload));
+  } else {
+    // Fallback: direct API message (only for testing outside Telegram)
+    const BOT_TOKEN = "YOUR_BOT_TOKEN";
+    const ADMIN_ID  = "YOUR_ADMIN_ID";
+    const msg = `🔔 YANGI BUYURTMA!\n\n👤 ${name}\n📞 ${phone}\n🏠 ${addr}${note ? '\n💬 '+note : ''}\n\n🛒 Mahsulotlar:\n${itemsArr.join('\n')}\n\n💰 Jami: ${total.toLocaleString()} so'm`;
+    try {
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({chat_id: ADMIN_ID, text: msg})
+      });
+    } catch(e){ console.warn(e); }
+  }
+
+  // Save locally
+  const order = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('uz-UZ'),
+    items: {...cart},
+    total, name, status:'Qabul qilindi'
+  };
+  orders.unshift(order);
+  cart = {};
+  save(); updateBadge();
+  closeScr('scrCheckout'); closeScr('scrCart');
+  document.getElementById('scrSuccess').classList.add('on');
+}
+
+function goHome(){
+  closeScr('scrSuccess');
+  nav('catalog', document.querySelector('.tab'));
+}
+
+// ── ORDERS ──
+function renderOrders(){
+  const el = document.getElementById('ordersList');
+  if(!orders.length){
+    el.innerHTML = `<div class="empty-box"><div class="empty-ico">📭</div><div class="empty-txt">Hozircha buyurtmalar yo'q</div><button class="go-btn" onclick="nav('catalog',document.querySelector('.tab'))">Menuga o'tish →</button></div>`;
+    return;
+  }
+  const smap = {
+    'Qabul qilindi':'', "Tayyorlanmoqda":'', "Tayyor":"done", "Bekor":"cancelled", "Yetkazildi":"done"
+  };
+  el.innerHTML = orders.map(o => {
+    const cls = smap[o.status] || '';
+    return `<div class="order-card">
+      <div class="oh">
+        <div><div class="oid">Buyurtma #${String(o.id).slice(-5)}</div><div class="odate">${o.date}</div></div>
+        <div class="ostatus ${cls}">${o.status}</div>
+      </div>
+      ${Object.values(o.items).map(i => `<div class="oitem">${i.em} ${i.name} x${i.qty}</div>`).join('')}
+      <div class="ototal">Jami: ${o.total.toLocaleString()} so'm</div>
+    </div>`;
+  }).join('');
+}
+
+// ── PRODUCT SYNC FROM BOT (admin qo'shganda) ──
+tg?.onEvent && tg.onEvent('web_app_data', function(data){
+  try {
+    const d = JSON.parse(data);
+    if(d.action === 'sync_products' && Array.isArray(d.products)){
+      PRODUCTS = d.products;
+      localStorage.setItem('ds_products', JSON.stringify(PRODUCTS));
+      buildCats(); renderProds();
+    }
+  } catch(e){}
+});
+
+// ── INIT ──
+buildCats();
+renderProds();
+updateBadge();
+</script>
+</body>
+</html>
